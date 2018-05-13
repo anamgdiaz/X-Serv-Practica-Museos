@@ -1,0 +1,28 @@
+{% extends "pagina_principal.html" %}
+<html>
+<body>
+
+{% block login %}
+	<div class="right" >
+			{{form_logueado|safe}}
+	</div>
+{% endblock %}
+
+{% block filtro %}
+		<div class="filtro_distrito">
+			<h2>Filtro de museos por distrito</h2>
+				<form action= "" method="post">
+					<input type="text" name="distrito">
+					<input type="submit" value = "Seleccionar distrito">
+				</form>
+		</div>
+	</div>
+{% endblock %}
+
+{% block listas %}
+<div class = 'museos_todos'>
+	{{lista_filtros|safe}}
+</div>
+{% endblock %}
+</body>
+</html>

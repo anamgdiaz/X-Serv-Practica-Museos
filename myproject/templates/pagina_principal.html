@@ -1,0 +1,29 @@
+{% load static %}
+<!DOCTYPE>
+<head>
+	<title>MUSEOS DE MADRID </title>
+</head>
+
+<body>
+	<div id = "titulo">
+		<h1> Madrid es cultura! </h1>
+	</div>
+	{% block menu %}
+	<div id= "box">
+		<a href="/">Inicio</a>
+		<a href="/museos">Museos</a>
+		<a href="/about">Ayuda</a>
+	</div>
+	{% endblock %}
+    {% block listas %}
+	<div id="contenidocomun">
+	<div class = "Cargar">
+		<form method="post" action="/cargar_datos">
+        <input class="cargar" type="submit" value="Cargar museos" name="cargar">
+     	</form>
+		</div>	
+	{% endblock %}
+	<div id="pie_pagina">
+			{{pie_pagina|safe}}
+	</div>
+</body>

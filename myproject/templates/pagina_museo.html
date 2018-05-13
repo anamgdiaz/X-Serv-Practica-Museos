@@ -1,0 +1,20 @@
+{% extends "pagina_principal.html" %}
+<html>
+<body>
+	{% block login %}
+	<div class="right">
+		{{form_logueado|safe}}
+	</div>
+	{% endblock %}
+	{% block listas %}
+	<div class= "muestra_museos">
+			{{muestra_museos|safe}}
+	</div>
+	<div class="comentario">
+		{{form_comentario|safe}}
+		{{muestra_comentarios|safe}}
+	</div>
+	{% endblock %}
+		
+</body>
+</html>
