@@ -1,0 +1,25 @@
+{% extends "pagina_principal.html" %}
+
+<html>
+<body>
+{% block listas %}
+	<div class="titulo_pagina_public">
+		{{titulo_pagina|safe}}
+	</div>
+<div class="museos_seleccionados_public">
+	{{lista_museos_sel|safe}}
+	{% if seleccionados.has_previous %}
+		<a href="?page={{seleccionados.previous_page_numbers}}"> Página Anterior</a>
+	{% endif %}
+
+	{{seleccionados.number}} - {{seleccionados.paginator.num_pages}}
+
+	{% if seleccionados.has_next %}
+		<a href="?page={{seleccionados.next_page_number}}"> Página Siguiente</a>
+	{% endif %}
+</div>
+{% endblock %}
+
+
+</body>
+</html>

@@ -1,0 +1,31 @@
+<?xml version='1.0' encoding ='UTF-8' ?>
+<INFORMACION>
+	<CABECERA>
+		<USUARIO>{{usuario}}</USUARIO>
+		<PAGINA>{{titulo_pagina}}</PAGINA>
+	</CABECERA>
+{% for seleccionado in museos_seleccionados %}
+	<MUSEO>
+		<ID-MUSEO>{{seleccionado.museo.id_museo}}</ID-MUSEO>
+		<NOMBRE>{{seleccionado.museo.nombre}}</NOMBRE>
+		<CONTENT-URL>{{seleccionado.museo.content_url}}</CONTENT-URL>
+		<DESCRIPCION>{{seleccionado.museo.descripcion}}</DESCRIPCION>
+		<EQUIPAMIENTO>{{seleccionado.museo.equipamiento}}</EQUIPAMIENTO>
+		<ACCESIBILIDAD>{{seleccionado.museo.accesibilidad}}</ACCESIBILIDAD>
+		<HORARIO>{{seleccionado.museo.horario}}</HORARIO>
+		<DIRECCION>
+			<NOMBRE_VIA>{{seleccionado.museo.nombre_via}}</NOMBRE_VIA>
+			<NUM>{{seleccionado.museo.num}}</NUM>
+			<BARRIO>{{seleccionado.museo.barrio}}</BARRIO>
+			<DISTRITO>{{seleccionado.museo.distrito}}</DISTRITO>
+			<CODIGO_POSTAL>{{seleccionado.museo.codigo_postal}}</CODIGO_POSTAL>
+		</DIRECCION>
+		<TRANSPORTE>{{seleccionado.museo.transporte}}</TRANSPORTE>
+		<DATOS-CONTACTO>
+			<TELEFONO>{{seleccionado.museo.transporte}}</TELEFONO>
+			<EMAIL>{{seleccionado.museo.email}}</EMAIL>
+		</DATOS-CONTACTO>
+
+	</MUSEO>
+{% endfor %}
+</INFORMACION>

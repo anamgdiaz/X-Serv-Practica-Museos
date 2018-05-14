@@ -1,0 +1,54 @@
+{% extends "pagina_principal.html" %}
+<html>
+<body>
+{% block login %}
+	<div class="right">
+	{{form_logueado|safe}}
+</div>
+{% endblock %}
+
+{% block listas %}
+	<div class = "titulo_pagina">
+			{{titulo_pagina|safe}}
+	</div>
+	<div class="cambios">
+		<form action = "" method= "POST">
+			<p>Introduzca un titulo:</p>
+			<input type="text" name="titulo">
+			<input type="submit" value="Cambiar">
+		</form>
+		<form action="" method="POST">
+				<p>Elija el tamaño de la letra </p>
+				<input type="text" name ="letra">
+				<p>Elija el color de las letras </p>
+				<input type="color" name = "color">
+				<input type="submit" value="Cambiar">
+		</form>
+		</div>
+	<div class="lista_museos">
+		{{lista_museos|safe}}
+		{% if seleccion.has_previous %}
+		<a href="?page={{seleccion.previous_page_numbers}}"> Página Anterior</a>
+		{% endif %}
+
+	{{seleccion.number}} - {{seleccion.paginator.num_pages}}
+
+	{% if seleccion.has_next %}
+		<a href="?page={{seleccion.next_page_number}}"> Página Siguiente</a>
+	{% endif %}
+	</div>
+	<div class="museos_seleccionados">
+	{{lista_museos_sel|safe}}
+	{% if seleccionados.has_previous %}
+		<a href="?page={{seleccionados.previous_page_numbers}}"> Página Anterior</a>
+	{% endif %}
+
+	{{seleccionados.number}} - {{seleccionados.paginator.num_pages}}
+
+	{% if seleccionados.has_next %}
+		<a href="?page={{seleccionados.next_page_number}}"> Página Siguiente</a>
+	{% endif %}
+{% endblock %}
+</div>
+</body>
+</html>

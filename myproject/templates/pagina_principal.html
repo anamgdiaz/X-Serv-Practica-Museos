@@ -15,6 +15,13 @@
 		<a href="/about">Ayuda</a>
 	</div>
 	{% endblock %}
+	<div id="main">
+	{% block login %}
+		<div class = "right">
+				{{form_logueado|safe}}
+      	</div>
+      	 {% endblock %}	
+    </div>
     {% block listas %}
 	<div id="contenidocomun">
 	<div class = "Cargar">

@@ -21,8 +21,10 @@ urlpatterns = [
     url(r'^$',views.pagina_principal, name = "Página principal de la práctica"),
     url(r'museos$',views.pagina_museos,name = "Página con todos los museos"),
     url(r'^museos/(.*)',views.pagina_museo,name = "Página de un museo en la aplicación"),
-#    url(r'(.*)/$',views.pagina_usuario,name = "Página personal del usuario"),
-#    url(r'^(.*)/xml$',views.pagina_xml,name = "Canal XML para los museos seleccionados por ese usuario"),
+    url(r'(.*)/$',views.pagina_usuario,name = "Página personal del usuario"),
+    url(r'^(.*)/xml$',views.pagina_xml,name = "Canal XML para los museos seleccionados por ese usuario"),
+    url(r'^login',views.login_user,name = "Login de usuarios"),
+    url(r'^logout',views.logout_user),
 #    url(r'about$',views.about,name = "Información autoría de la práctica explicando el funcionamiento"),
     url(r'^cargar_datos$',views.cargar_datos, name = "Página donde se cargan los datos"),
 ]

@@ -1,10 +1,11 @@
 from django.shortcuts import render
 from .models import Museo,Comentarios,Cambio_Estilo, Museo_Seleccionado
 from django.http import HttpResponse,HttpResponseRedirect
+from django.contrib.auth.models import User
+from django.contrib.auth import login,logout,authenticate
 from django.template.loader import get_template
 from django.template import Context,RequestContext
 from django.views.decorators.csrf import csrf_exempt
-from urllib.request import urlopen
 import xml.etree.ElementTree as ET
 import datetime
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -104,10 +105,45 @@ def cargar_datos(request):
 	return HttpResponseRedirect('/')
 
 @csrf_exempt
+def login_user(request):
+	username = request.POST['username']
+	password = request.POST['password']
+	user = authenticate(username = username,password = password)
+	if user is not None:
+		login(request,user)
+		return HttpResponseRedirect('/'+str(user))
+	else:
+		log_form = logueado_form(request)
+		template = get_template('error.html')
+		c = Context({'txt_error':'Usuario no autorizado','log_form':log_form})
+		return HttpResponse(template.render(c))
+
+@csrf_exempt
+def logout_user(request):
+	logout(request)
+	return HttpResponseRedirect('/')
+
+@csrf_exempt
+def logueado_form(request):
+	login = '<form action="login" method="POST">'
+	login += 'Usuario    	<input type="text" name="username"><br><br>'
+	login += 'Contraseña	<input type="password" name="password"><br><br>'
+	login += '<input type="submit" value="Entrar"></form>'
+	return login 
+
+@csrf_exempt
 def pagina_principal(request): #DE MOMENTO SACO LA LISTA DE MUSEOS 	
 	template = get_template("pagina_principal.html")
+	if request.user.is_authenticated():
+		usuario = str(request.user)
+		form_logueado = 'Bienvenid@,' + usuario + '<br>'
+		form_logueado += '<a href="http://localhost:8000/'+ usuario + '"> Mi página</a><br>'
+		form_logueado += '<a href="http://localhost:8000/'+ usuario + '/xml"> Mi página en XML</a><br>'
+		form_logueado += '<a href="http://localhost:8000/logout">	Logout</a>'
+	else:
+		form_logueado = logueado_form(request)
 	pie_pagina = pagina_pie()	
-	c = Context({'pie_pagina':pie_pagina})
+	c = Context({'pie_pagina':pie_pagina,'form_logueado':form_logueado})
 	return HttpResponse(template.render(c))		
 
 @csrf_exempt		
@@ -232,3 +268,110 @@ def pagina_museo(request,identidad):
 		return HttpResponse(template.render(c))		
 	except ObjectDoesNotExist:
 		return HttpResponse("No existe ningún museos para ese id")
+@csrf_exempt
+def pagina_usuario(request,usuario):
+	if request.user.is_authenticated():
+		user = str(request.user)
+		form_logueado = 'Bienvenid@,' + user +'<br>'
+		form_logueado += '<a href="http://localhost:8000/'+ user + '"> Mi página</a><br>'
+		form_logueado += '<a href="http://localhost:8000/'+ user + '/xml"> Mi página en XML</a><br>'
+		form_logueado += '<a href="http://localhost:8000/logout">	Logout</a><br>'
+	else:
+		form_logueado = 'Para entrar al sitio vaya al '+'<a href="http://localhost:8000/">Inicio</a>'
+	museos = Museo.objects.all()
+	paginator = Paginator(museos,5)
+	page = request.GET.get('page')
+	try:
+	 	seleccion = paginator.page(page)
+	except PageNotAnInteger:
+		seleccion = paginator.page(1)
+	except EmptyPage:
+		seleccion = paginator.page(paginator.num_pages)
+	lista_museos = "<h4>Museos de Madrid que puede seleccionar:</h4><br>"
+	for museo in seleccion:
+		nombre_museo = museo.nombre
+		lista_museos += '<a href="http://localhost:8000/museos/'+ str(museo.id_museo)+'">'+ nombre_museo +'</a>'
+		lista_museos +=	'<form action="" method ="POST">'
+		lista_museos += '<button type="submit" name="Seleccionar" value="'+nombre_museo+'">Seleccionar</button></form>'
+	usuario_entra = User.objects.get(username = usuario)
+	if request.method == 'POST':
+		key = request.body.decode("utf-8").split('=')[0]
+		if key == 'titulo':
+			titulo = request.POST['titulo']
+			try:
+				usuario_bbdd = Cambio_Estilo.objects.get(usuario= usuario_entra)
+				usuario_bbdd.titulo = titulo
+				usuario_bbdd.save()
+			except ObjectDoesNotExist:
+				not_exist = Cambio_Estilo(usuario =usuario_entra,titulo=titulo)
+				not_exist.save()
+		elif key == "Seleccionar":
+			nombre_mus = request.POST['Seleccionar']
+			fecha = datetime.datetime.today()
+			lista_museos_seleccionados = Museo_Seleccionado.objects.all()
+			try:
+				museo = Museo.objects.get(nombre = nombre_mus)
+				esta_seleccionado = False
+				for i in lista_museos_seleccionados:
+					if str(i.usuario) == str(usuario):
+						if nombre_mus == i.museo.nombre:
+							esta_seleccionado = True
+				if esta_seleccionado == False:
+					museo_sel = Museo_Seleccionado(museo = museo,usuario = usuario_entra,fecha = fecha)
+					museo_sel.save()
+			except ObjectDoesNotExist:
+				return('')				
+		elif key == 'letra':
+			try:
+				usuario_camb = Cambio_Estilo.objects.get(usuario = usuario_entra)
+			except:
+				not_user = Cambio_Estilo(usuario = usuario_entra)
+				not_user.save()
+				usuario_estilo = Cambio_Estilo.objects.get(usuario = usuario_entra)
+			usuario_camb.tamaño = request.POST['letra']
+			usuario_camb.color = request.POST['color']
+			usuario_camb.save()
+	
+	lista_museos_sel = ''
+#	usuario_bbdd = User.objects.get(username = usuario)
+	museos_seleccionados = Museo_Seleccionado.objects.filter(usuario = usuario_entra)
+	paginator = Paginator(museos_seleccionados,5)
+	page = request.GET.get('page')
+	try:
+	 	seleccionados = paginator.page(page)
+	except PageNotAnInteger:
+		seleccionados = paginator.page(1)
+	except EmptyPage:
+		seleccionados = paginator.page(paginator.num_pages)
+	for i in seleccionados:
+		lista_museos_sel += '<p><a href="'+ i.museo.content_url + '">'+'<h4>'+i.museo.nombre +'</h4></a></p><br>'
+		lista_museos_sel += "Fecha de selección" + str(i.fecha) + '<br>'
+		lista_museos_sel += 'Dirección:' + i.museo.nombre_via + ',' + str(i.museo.num)  + '<br>'
+		lista_museos_sel += '<p><a href=http://localhost:8000/museos/'+ str(i.museo.id_museo)+ '>'+'Más Información</a></p><br>'
+	
+	if request.user.is_authenticated():
+		username = str(request.user)
+		if usuario == username:
+			template = get_template("pagina_usuario.html")
+			try:
+				titulo_pagina = Cambio_Estilo.objects.get(usuario= usuario_entra).titulo
+			except ObjectDoesNotExist:
+				titulo_pagina = "Pagina personal de " + str(request.user)	
+		pie_pagina = pagina_pie()
+		c = Context({'lista_museos':lista_museos,'titulo_pagina':titulo_pagina,'form_logueado':form_logueado,'lista_museos_sel':lista_museos_sel,'seleccion':seleccion,'seleccionados':seleccionados,'pie_pagina':pie_pagina})
+	else:
+		template = get_template("pagina_publica.html")
+		titulo_pagina = Cambio_Estilo.objects.get(usuario= usuario_entra).titulo
+		pie_pagina = pagina_pie()
+		c = Context({'titulo_pagina':titulo_pagina,'lista_museos_sel':lista_museos_sel,'seleccionados':seleccionados,'pie_pagina':pie_pagina})
+	
+	return HttpResponse(template.render(c))	
+def pagina_xml(request,usuario):
+	template = get_template('usuario_xml.xml')
+	usuario_entra = User.objects.get(username = usuario)
+	museos_seleccionados = Museo_Seleccionado.objects.filter(usuario = usuario_entra)
+	cambio_estilos = Cambio_Estilo.objects.filter(usuario = usuario_entra)
+	for j in cambio_estilos:
+		titulo_pagina = j.titulo
+	c = RequestContext(request,{'usuario':usuario,'titulo_pagina':titulo_pagina,'museos_seleccionados':museos_seleccionados})
+	return HttpResponse(template.render(c),content_type="text/xml")	
