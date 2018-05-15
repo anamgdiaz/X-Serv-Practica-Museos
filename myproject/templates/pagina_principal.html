@@ -21,15 +21,36 @@
 				{{form_logueado|safe}}
       	</div>
       	 {% endblock %}	
+    {% block filtro %}
+      	<div class = "Usuarios">
+				{{lista_usuarios|safe}}
+    	</div>
+    {% endblock %}
     </div>
     {% block listas %}
 	<div id="contenidocomun">
+		<br>
+			<div class = "Boton">
+				{{Boton|safe}}
+			</div>
+		<br><br>
+			<div class="Accesibles">
+				{{lista_accesibles|safe}}
+
+			</div>
+		<br><br>
+			<div class = "Lista">
+				<h1>Lista de Museo más comentados</h1>
+				{{lista|safe}}
+			</div>
+		<br><br>
 	<div class = "Cargar">
 		<form method="post" action="/cargar_datos">
         <input class="cargar" type="submit" value="Cargar museos" name="cargar">
      	</form>
 		</div>	
 	{% endblock %}
+</div>
 	<div id="pie_pagina">
 			{{pie_pagina|safe}}
 	</div>

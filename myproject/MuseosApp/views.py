@@ -23,7 +23,6 @@ def pagina_pie():
 def cargar_datos(request):
 	tree = ET.parse('MuseosApp/201132-0-museos.xml')
 	contenidos = tree.getroot()
-#contenidos = ET.tostring(root, encoding='unicode', method='xml')
 	equipamiento = ""
 	for contenido in contenidos.findall('contenido'):
 		for atributos in contenido.findall('atributos'):
@@ -130,10 +129,20 @@ def logueado_form(request):
 	login += 'Contraseña	<input type="password" name="password"><br><br>'
 	login += '<input type="submit" value="Entrar"></form>'
 	return login 
-
+def boton_accesible(valor_acc):
+	respuesta =  """
+			<form action="" method="POST">
+			<button type="submit" name = "accesible"value=""" +str(valor_acc)+ """>Mostrar museos accesibles</button>
+			</form>
+		"""
+	return respuesta 
 @csrf_exempt
-def pagina_principal(request): #DE MOMENTO SACO LA LISTA DE MUSEOS 	
+def pagina_principal(request):
 	template = get_template("pagina_principal.html")
+	lista_usuarios = ''
+	lista = ''
+	usuario=''
+	valor = 1
 	if request.user.is_authenticated():
 		usuario = str(request.user)
 		form_logueado = 'Bienvenid@,' + usuario + '<br>'
@@ -142,8 +151,60 @@ def pagina_principal(request): #DE MOMENTO SACO LA LISTA DE MUSEOS
 		form_logueado += '<a href="http://localhost:8000/logout">	Logout</a>'
 	else:
 		form_logueado = logueado_form(request)
-	pie_pagina = pagina_pie()	
-	c = Context({'pie_pagina':pie_pagina,'form_logueado':form_logueado})
+	if request.method == 'POST':
+		key = request.body.decode("utf-8").split('=')[0]
+		valor = request.body.decode("utf-8").split('=')[1]
+		if key == 'accesible' and valor == '1':	
+			valor = 0	
+			museos = Museo.objects.all()
+			museos_c_acc = museos.order_by('-num_comentario')[:5]
+			for i in museos_c_acc:
+				comentarios = Comentarios.objects.filter(museo = i)
+				if len(comentarios) != 0 and i.accesibilidad == '1':
+					nombre_museo = i.nombre
+					content_url = i.content_url
+					lista += '<br><a href="'+ content_url + '">' + nombre_museo + '</a><br>'
+					lista += "<h4>Direccion: </h4>" + i.nombre_via + "," + str(i.num) + '<br>'
+					lista += '<p><a href="http://localhost:8000/museos/'+ str(i.id_museo)+ '">'+'Más Información</a></p><br>'
+		elif key == 'accesible' and valor == '0':
+			valor = 1
+			museos = Museo.objects.all()
+			museos_c_acc = museos.order_by('-num_comentario')[:5]
+			for i in museos_c_acc:
+				comentarios = Comentarios.objects.filter(museo = i)
+				if len(comentarios) != 0 :
+					nombre_museo = i.nombre
+					content_url = i.content_url
+					lista += '<br><a href="'+ content_url + '">' + nombre_museo + '</a><br>'
+					lista += "<h4>Direccion: </h4>" + i.nombre_via + "," + str(i.num) + '<br>'
+					lista += '<a href="http://localhost:8000/museos/' + str(i.id_museo) + '">' + "Más información" + '</a><br>'
+	else:
+		museos = Museo.objects.all()
+		museos_c_acc = museos.order_by('-num_comentario')[:5]
+		for i in museos_c_acc:
+			comentarios = Comentarios.objects.filter(museo = i)
+			if len(comentarios) != 0 :
+				nombre_museo = i.nombre
+				content_url = i.content_url
+				lista += '<br><a href="'+ content_url + '">' + nombre_museo + '</a><br>'
+				lista += "<h4>Direccion: </h4>" + i.nombre_via + "," + str(i.num) + '<br>'
+				lista += '<a href="http://localhost:8000/museos/' + str(i.id_museo) + '">' + "Más información" + '</a><br>'
+
+	pie_pagina = pagina_pie()
+	Boton = boton_accesible(valor)
+	usuario_entra = User.objects.all()
+	lista_usuarios += "<h3>Lista de paginas personales: </h3>"+'<br>'
+	for usuario in usuario_entra:
+		lista_usuarios += usuario.username + ':'
+		try :
+			cambio_estilos = Cambio_Estilo.objects.filter(usuario = usuario)
+			for j in cambio_estilos:
+				titulo_pagina = j.titulo
+			lista_usuarios += '<a href=http://localhost:8000/'+ str(usuario.username) + '>' + titulo_pagina +'</a><br>'
+		except ObjectDoesNotExist:
+			lista_usuarios += "Pagina personal de " + str(usuario.username)	
+	
+	c = Context({'Boton':Boton,'pie_pagina':pie_pagina,'form_logueado':form_logueado,'lista':lista,'lista_usuarios':lista_usuarios})	
 	return HttpResponse(template.render(c))		
 
 @csrf_exempt		
@@ -241,8 +302,8 @@ def pagina_museo(request,identidad):
 		if request.user.is_authenticated():
 			form_comentario += '<p>Añada un comentario: <br></p>'
 			form_comentario += '<form action="" method="POST">'
-			form_comentario += '<input type="text" name="comentario"'
-			form_comentario += '<<input type="submit" value=""></form>'
+			form_comentario += '<input type="text" name="comentario">'
+			form_comentario += '<input type="submit" value="Enviar"></form>'
 		if request.method == "POST":
 			comentario = request.POST['comentario']
 			museo = Museo.objects.get(id_museo = id_mus)
@@ -303,6 +364,7 @@ def pagina_usuario(request,usuario):
 				usuario_bbdd.titulo = titulo
 				usuario_bbdd.save()
 			except ObjectDoesNotExist:
+				titulo = "Pagina de " + str(usuario_entra)
 				not_exist = Cambio_Estilo(usuario =usuario_entra,titulo=titulo)
 				not_exist.save()
 		elif key == "Seleccionar":
@@ -333,7 +395,6 @@ def pagina_usuario(request,usuario):
 			usuario_camb.save()
 	
 	lista_museos_sel = ''
-#	usuario_bbdd = User.objects.get(username = usuario)
 	museos_seleccionados = Museo_Seleccionado.objects.filter(usuario = usuario_entra)
 	paginator = Paginator(museos_seleccionados,5)
 	page = request.GET.get('page')
