@@ -436,3 +436,21 @@ def pagina_xml(request,usuario):
 		titulo_pagina = j.titulo
 	c = RequestContext(request,{'usuario':usuario,'titulo_pagina':titulo_pagina,'museos_seleccionados':museos_seleccionados})
 	return HttpResponse(template.render(c),content_type="text/xml")	
+def about(request):
+	template = get_template('about.html')
+	pie_pagina = pagina_pie()
+	context = RequestContext(request,{'pie_pagina':pie_pagina})
+	return HttpResponse(template.render(context))
+
+def personalizar_css(request):
+	if request.user.is_authenticated():
+		usuario_entra = User.objects.get(username = request.user)
+		letra =  Cambio_Estilo.objects.get(usuario = usuario_entra).tamaño +'px'
+		color =  Cambio_Estilo.objects.get(usuario = usuario_entra).color
+	else:
+		letra = "12px";
+		color = "#17202A";
+
+	template = get_template('style.css')
+	c = Context({'color':color,'letra':letra})
+	return HttpResponse(template.render(c),content_type="text/css")
