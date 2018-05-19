@@ -53,9 +53,10 @@
 			</div>
 		<br><br>
 	<div class = "Cargar">
-		<form method="post" action="/cargar_datos">
-        <input class="cargar" type="submit" value="Cargar museos" name="cargar">
-     	</form>
+<!-- 		<form method="post" action="/cargar_datos">
+        <input class="cargar" type="submit" value="Cargar_museos" name="cargar">
+     	</form> -->
+     	{{cargar|safe}}
 		</div>	
 	{% endblock %}
 </div>

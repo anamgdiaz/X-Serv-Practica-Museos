@@ -143,6 +143,8 @@ def pagina_principal(request):
 	lista = ''
 	usuario=''
 	valor = 1
+	titulo_pagina = ''
+	cargar = ''
 	if request.user.is_authenticated():
 		usuario = str(request.user)
 		form_logueado = 'Bienvenid@,' + usuario + '<br>'
@@ -189,7 +191,10 @@ def pagina_principal(request):
 				lista += '<br><a href="'+ content_url + '">' + nombre_museo + '</a><br>'
 				lista += "<h4>Direccion: </h4>" + i.nombre_via + "," + str(i.num) + '<br>'
 				lista += '<a href="http://localhost:8000/museos/' + str(i.id_museo) + '">' + "Más información" + '</a><br>'
-
+	museos = Museo.objects.all()
+	if len(museos) == 0:
+		cargar = '<form method="post" action="/cargar_datos">'
+		cargar += '<input type="submit" value="Cargar_museos" name="cargar"></form>'
 	pie_pagina = pagina_pie()
 	Boton = boton_accesible(valor)
 	usuario_entra = User.objects.all()
@@ -198,13 +203,18 @@ def pagina_principal(request):
 		lista_usuarios += usuario.username + ':'
 		try :
 			cambio_estilos = Cambio_Estilo.objects.filter(usuario = usuario)
-			for j in cambio_estilos:
-				titulo_pagina = j.titulo
+			if len(cambio_estilos) == 0:
+				titulo_pagina = 'Página de ' + usuario.username
+				cambios_estilo = Cambio_Estilo(titulo = titulo_pagina,usuario=usuario)
+				cambios_estilo.save()
+			else:
+				for j in cambio_estilos:
+					titulo_pagina = j.titulo
 			lista_usuarios += '<a href=http://localhost:8000/'+ str(usuario.username) + '>' + titulo_pagina +'</a><br>'
 		except ObjectDoesNotExist:
 			lista_usuarios += "Pagina personal de " + str(usuario.username)	
-	
-	c = Context({'Boton':Boton,'pie_pagina':pie_pagina,'form_logueado':form_logueado,'lista':lista,'lista_usuarios':lista_usuarios})	
+
+	c = Context({'Boton':Boton,'pie_pagina':pie_pagina,'form_logueado':form_logueado,'lista':lista,'lista_usuarios':lista_usuarios,'cargar':cargar})	
 	return HttpResponse(template.render(c))		
 
 @csrf_exempt		
@@ -454,6 +464,7 @@ def personalizar_css(request):
 	template = get_template('style.css')
 	c = Context({'color':color,'letra':letra})
 	return HttpResponse(template.render(c),content_type="text/css")
+	
 def pagina_principal_xml(request):
 	template = get_template('pagina_principal.xml')
 	museos = Museo.objects.all()

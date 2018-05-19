@@ -37,7 +37,7 @@ class Cambio_Estilo(models.Model):
 	usuario = models.ForeignKey(User)
 	tamaño = models.CharField(max_length = 32)
 	color = models.CharField(max_length = 32)
-	titulo = models.CharField(max_length = 32)
+	titulo = models.TextField()
 
 class Museo_Seleccionado(models.Model):
 	usuario = models.ForeignKey(User)
