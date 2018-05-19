@@ -1,0 +1,15 @@
+<?xml version='1.0' encoding ='UTF-8' ?>
+<MUSEOS>
+	<TITULO>Página Principal en XML</TITULO>
+	<INFORMACION>
+		{% for museo in lista_museos %}
+		<MUSEO>
+			<NOMBRE>{{museo.nombre}}</NOMBRE>
+			<CONTENT-URL>{{museo.content_url}}</CONTENT-URL>
+			<NOMBRE-VIA>{{museo.nombre_via}}</NOMBRE-VIA>
+			<NUM>{{museo.num}}</NUM>
+		</MUSEO>
+		{% endfor %}
+	</INFORMACION>
+</MUSEOS>	
+		

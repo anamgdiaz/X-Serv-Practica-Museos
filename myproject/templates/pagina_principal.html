@@ -3,6 +3,7 @@
 <head>
 	<title>MUSEOS DE MADRID </title>
 	<link rel="stylesheet" href="/style.css" type="text/css" />
+	<link rel="shortcut icon" type="image/ico" href="/images/favicon.ico"/>
 </head>
 
 <body>
@@ -14,9 +15,12 @@
 		</div>
 	{% block menu %}
 	<div id= "box">
-		<a href="/">Inicio</a>
-		<a href="/museos">Museos</a>
-		<a href="/about">Ayuda</a>
+	<ul>
+	  <li><a class="active" href="/">Home</a></li>
+ 	 <li><a href="museos">Museos</a></li>
+ 	 <li><a href="/xml">XML</a></li>
+ 	 <li style="float:right"><a href="/about">Ayuda</a></li>
+	</ul>
 	</div>
 	{% endblock %}
 	<div id="main">

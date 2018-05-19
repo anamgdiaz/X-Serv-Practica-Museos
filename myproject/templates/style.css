@@ -6,12 +6,45 @@
 body{
 	font-family: American Typewriter,serif;
 	background-color:lightyellow;
-	color:{{color|safe}};
-	font-size:{{letra|safe}};
+    margin-left: 100px;
+    color:{{color|safe}};
+    font-size:{{letra|safe}};
 	margin:0;
 	padding: 0;
 }
 
+ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #F1C40F;
+}
+
+li {
+    float: left;
+    border-right:1px solid #bbb;
+}
+
+li:last-child {
+    border-right: none;
+}
+
+li a {
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+}
+
+li a:hover:not(.active) {
+    background-color: #F1C40F;
+}
+
+.active {
+    background-color: #E74C3C  ;
+}
 #titulo{
 	font-family:"Courier New", Courier, monospace;
 	font-size: 2vw;
@@ -23,9 +56,8 @@ body{
 }
 
 #box{
-	width:auto;
+    width:800px;
 	margin-left: 100px;
-	margin-right:550px;
 	font-size: 20px;
 	font-weight: bold;
 	line-height: 30px;
@@ -38,16 +70,16 @@ body{
 	margin-left: 100px;
 }
 .right{
-    width: 230px;
+    width: 250px;
 	height: auto;
-	margin-top:25px;
+	margin-top:50px;
 	background: #F1C40F;
     text-align: justify;
     opacity: 0.7;
 	margin-left: 790px;
 }
 .right input{
-	font-weight: bols;
+	font-weight: bold;
 }
 .box{
 	font-weight: bold;
@@ -76,6 +108,7 @@ body{
     width:700px;
     border:1px solid #D35400;
     margin-right: 100px;
+    margin-left: 100px;
     height:auto;
     text-align:justify; 
     background:#F5CBA7; 
@@ -96,7 +129,7 @@ body{
 	margin-top:-100px;
     width:700px;
     border:1px solid #D35400;
-    margin-left: 50px;
+    margin-left: 150px;
     height:auto;
     text-align:justify;  
     background:#F5CBA7; 
@@ -108,7 +141,7 @@ body{
 	width: 230px;
 	height: auto;
 	margin-top:0px;
-	margin-left: 790px;
+	margin-left: 900px;
     color: #1F618D;
     background: #F1C40F;
     text-align: justify;
@@ -116,20 +149,21 @@ body{
 
 }
 .lista_museos{
-	margin-top:0px;
+	margin-top:50px;
     width:500px;
     border:1px solid #D35400;
     height:auto;
-    text-align:justify;  
+    text-align:justify;
+    margin-left: 100px;  
     background:#F5CBA7; 
     opacity:0.9;
 }
 
 .museos_seleccionados{
-	margin-top:-250px;
+	margin-top:-350px;
     width:400px;
     border:1px solid #D35400;
-    margin-left: 700px;
+    margin-left: 725px;
     color: #17202A;
     background: #F1C40F;
     text-align: justify;
@@ -140,28 +174,36 @@ body{
     font-family:"Courier New", Courier, monospace;
     font-size: 1.75vw;
     text-align:center; 
+    margin-left: 100px;
     width:500px;
     margin-top: -100px;
 }
 .cambios{
-    text-align:justify;  
+    text-align:justify;
+    margin-left: 100px;  
 
 }
 .titulo_pagina_public{
 	font-family:"Courier New", Courier, monospace;
     font-size: 1.75vw;
-    text-align:center; 
+    text-align:center;
+    margin-left: 100px; 
     width:500px;
     margin-top: 0px;
 }
 .museos_seleccionados_public{
     width:650px;
     border:1px solid #D35400;
+    margin-left: 100px;
     text-align:justify;  
     background:#F5CBA7; 
     opacity:0.9;
 }
 
+.about{
+    width:800px;
+    margin-left:100px;
+}
 #pie_pagina{
 	background-color: #F5B7B1;
 	text-align: center;

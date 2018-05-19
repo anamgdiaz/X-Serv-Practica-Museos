@@ -454,3 +454,10 @@ def personalizar_css(request):
 	template = get_template('style.css')
 	c = Context({'color':color,'letra':letra})
 	return HttpResponse(template.render(c),content_type="text/css")
+def pagina_principal_xml(request):
+	template = get_template('pagina_principal.xml')
+	museos = Museo.objects.all()
+	lista_museos = museos.order_by('-num_comentario')[:5]
+	c = RequestContext(request,{'lista_museos':lista_museos})
+	return HttpResponse(template.render(c),content_type="text/xml")
+

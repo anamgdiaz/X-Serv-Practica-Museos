@@ -25,6 +25,7 @@
 				<input type="submit" value="Cambiar">
 		</form>
 		</div>
+	<br>
 	<div class="lista_museos">
 		{{lista_museos|safe}}
 		{% if seleccion.has_previous %}
@@ -37,6 +38,7 @@
 		<a href="?page={{seleccion.next_page_number}}"> Página Siguiente</a>
 	{% endif %}
 	</div>
+	<br>
 	<div class="museos_seleccionados">
 	{{lista_museos_sel|safe}}
 	{% if seleccionados.has_previous %}
