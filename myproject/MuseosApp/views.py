@@ -229,22 +229,49 @@ def pagina_museos(request):
 		form_logueado += '<a href="http://localhost:8000/logout">	Logout</a><br>'
 	else:
 		form_logueado = 'Para entrar al sitio vaya al '+'<a href="http://localhost:8000/">Inicio</a>'
-
+	valor = 1
 	museos_filtrados = ""
 	lista_filtros = ""
 	filtro_distrito = ""
 	if request.method == "POST":
-		filtro_distrito = request.POST["distrito"].upper()
-		if filtro_distrito != "":				
-			museos_filtrados = Museo.objects.filter(distrito = filtro_distrito)
-			lista_filtros = "<h2>Los museos del " + filtro_distrito + " son:</h2><br>"				
-			for i in museos_filtrados:	
+		key = request.body.decode("utf-8").split('=')[0]
+		valor = request.body.decode("utf-8").split('=')[1]
+		if key == 'accesible' and valor == '1':	
+			valor = 0	
+			museos = Museo.objects.all()
+			for i in museos:
+				if i.accesibilidad == '1':
+					lista_filtros += '<h3>'+i.nombre+'</h3>'
+					lista_filtros += 'Dirección:' + i.nombre_via + ',' + str(i.num) +'<br>'
+					lista_filtros +='<a href="' + i.content_url + '">' + i.content_url +'</a><br>'
+					lista_filtros+= '<a href=http://localhost:8000/museos/'+ str(i.id_museo)+ '>'+'Más Información</a><br>'
+		elif key == 'accesible' and valor == '0':
+			valor = 1
+			museos = Museo.objects.all()
+			for i in museos:
 				lista_filtros += '<h3>'+i.nombre+'</h3>'
 				lista_filtros += 'Dirección:' + i.nombre_via + ',' + str(i.num) +'<br>'
 				lista_filtros +='<a href="' + i.content_url + '">' + i.content_url +'</a><br>'
 				lista_filtros+= '<a href=http://localhost:8000/museos/'+ str(i.id_museo)+ '>'+'Más Información</a><br>'
-				if filtro_distrito != i.distrito:
-					lista_filtros += filtro_distrito + "no existe: NO HAY MUSEOS" + i.distrito
+		elif key == 'distrito':
+			filtro_distrito = request.POST["distrito"].upper()
+			if filtro_distrito != "":				
+				museos_filtrados = Museo.objects.filter(distrito = filtro_distrito)
+				filtrado = False
+				lista_filtros = "<h2>Los museos del " + filtro_distrito + " son:</h2><br>"				
+				for i in museos_filtrados:	
+					if filtro_distrito == i.distrito:
+						filtrado = True
+						lista_filtros += '<h3>'+i.nombre+'</h3>'
+						lista_filtros += 'Dirección:' + i.nombre_via + ',' + str(i.num) +'<br>'
+						lista_filtros +='<a href="' + i.content_url + '">' + i.content_url +'</a><br>'
+						lista_filtros+= '<a href=http://localhost:8000/museos/'+ str(i.id_museo)+ '>'+'Más Información</a><br>'
+			if filtrado == False:
+				distritos = Museo.objects.all().values_list('distrito')
+				distinct_distrito = list(set(distritos))
+				lista_filtros = "Escriba correctamente el distrito<br>"
+				for i in distinct_distrito:
+					lista_filtros += i[0] + '<br>'
 
 	else:
 		museos_filtrados = Museo.objects.all()
@@ -253,8 +280,9 @@ def pagina_museos(request):
 			lista_filtros += 'Dirección:' + i.nombre_via + ',' + str(i.num) +'<br>'
 			lista_filtros +='<a href="' + i.content_url + '">' + i.content_url +'</a><br>'
 			lista_filtros+= '<a href=http://localhost:8000/museos/'+ str(i.id_museo)+ '>'+'Más Información</a><br>'
+	Boton = boton_accesible(valor)
 	pie_pagina = pagina_pie()
-	c = Context({'form_logueado': form_logueado,'lista_filtros':lista_filtros,'pie_pagina':pie_pagina,})
+	c = Context({'form_logueado': form_logueado,'lista_filtros':lista_filtros,'pie_pagina':pie_pagina,'Boton':Boton})
 	
 	return HttpResponse(template.render(c))			
 

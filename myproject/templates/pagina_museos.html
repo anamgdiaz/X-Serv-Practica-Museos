@@ -15,11 +15,15 @@
 					<input type="text" name="distrito">
 					<input type="submit" value = "Seleccionar distrito">
 				</form>
+				<a href="/museos">Ver todos</a>
 		</div>
 	</div>
 {% endblock %}
 
 {% block listas %}
+<div class = 'boton_museos'>
+	{{Boton|safe}}
+	</div>
 <div class = 'museos_todos'>
 	{{lista_filtros|safe}}
 </div>
