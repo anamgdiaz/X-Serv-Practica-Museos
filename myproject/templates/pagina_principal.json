@@ -1,0 +1,13 @@
+{
+	"MUSEOS COMENTADOS":{
+		"TITULO": "COMENTARIOS EN JSON",
+		{% for museo in lista_museos %}
+		"MUSEO":{
+			"NOMBRE":"{{museo.nombre}}",
+			"CONTENT-URL":"{{museo.content_url}}",
+			"NOMBRE_VIA":"{{museo.nombre_via}}",
+			"NUM":"{{museo.num}}"
+		}
+		{% endfor %}
+	}
+}

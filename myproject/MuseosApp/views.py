@@ -151,6 +151,7 @@ def pagina_principal(request):
 		form_logueado = 'Bienvenid@,' + usuario + '<br>'
 		form_logueado += '<a href="http://localhost:8000/'+ usuario + '"> Mi página</a><br>'
 		form_logueado += '<a href="http://localhost:8000/'+ usuario + '/xml"> Mi página en XML</a><br>'
+		form_logueado += '<a href="http://localhost:8000/'+ usuario + '/json"> Mi página en JSON</a><br>'
 		form_logueado += '<a href="http://localhost:8000/logout">	Logout</a>'
 	else:
 		form_logueado = logueado_form(request)
@@ -226,6 +227,7 @@ def pagina_museos(request):
 		form_logueado = 'Bienvenid@,' + user + '<br>'
 		form_logueado += '<a href="http://localhost:8000/'+ user + '"> Mi página</a><br>'
 		form_logueado += '<a href="http://localhost:8000/'+ user + '/xml"> Mi página en XML</a><br>'
+		form_logueado += '<a href="http://localhost:8000/'+ user + '/json"> Mi página en JSON</a><br>'
 		form_logueado += '<a href="http://localhost:8000/logout">	Logout</a><br>'
 	else:
 		form_logueado = 'Para entrar al sitio vaya al '+'<a href="http://localhost:8000/">Inicio</a>'
@@ -295,6 +297,7 @@ def pagina_museo(request,identidad):
 		form_logueado = 'Bienvenid@, ' + user + '<br>'
 		form_logueado += '<a href="http://localhost:8000/'+ user + '"> Mi página</a><br>'
 		form_logueado += '<a href="http://localhost:8000/'+ user + '/xml"> Mi página en XML</a><br>'
+		form_logueado += '<a href="http://localhost:8000/'+ user + '/json"> Mi página en JSON</a><br>'
 		form_logueado += '<a href="http://localhost:8000/logout">	Logout</a><br>'
 	else:
 		form_logueado = 'Para entrar al sitio vaya al '+'<a href="http://localhost:8000/">Inicio</a>'
@@ -395,6 +398,7 @@ def pagina_usuario(request,usuario):
 		form_logueado = 'Bienvenid@,' + user +'<br>'
 		form_logueado += '<a href="http://localhost:8000/'+ user + '"> Mi página</a><br>'
 		form_logueado += '<a href="http://localhost:8000/'+ user + '/xml"> Mi página en XML</a><br>'
+		form_logueado += '<a href="http://localhost:8000/'+ user + '/json"> Mi página en JSON</a><br>'
 		form_logueado += '<a href="http://localhost:8000/logout">	Logout</a><br>'
 	else:
 		form_logueado = 'Para entrar al sitio vaya al '+'<a href="http://localhost:8000/">Inicio</a>'
@@ -521,3 +525,25 @@ def pagina_principal_xml(request):
 	c = RequestContext(request,{'lista_museos':lista_museos})
 	return HttpResponse(template.render(c),content_type="text/xml")
 
+def pagina_json(request,usuario):
+	template = get_template('usuario_json.json')
+	usuario_entra = User.objects.get(username = usuario)
+	museos_seleccionados = Museo_Seleccionado.objects.filter(usuario = usuario_entra)
+	cambio_estilos = Cambio_Estilo.objects.filter(usuario = usuario_entra)
+	for j in cambio_estilos:
+		titulo_pagina = j.titulo
+	c = RequestContext(request,{'usuario':usuario,'titulo_pagina':titulo_pagina,'museos_seleccionados':museos_seleccionados})
+	return HttpResponse(template.render(c),content_type="text/json")	
+
+def pagina_principal_json(request):
+	template = get_template('pagina_principal.json')
+	museos = Museo.objects.all()
+	lista_museos = museos.order_by('-num_comentario')[:5]
+	c = RequestContext(request,{'lista_museos':lista_museos})
+	return HttpResponse(template.render(c),content_type="text/json")
+
+def canal_rss(request):
+	template = get_template('canal_comentarios.rss')
+	museos_comentarios = Comentarios.objects.all()
+	c = RequestContext(request,{'museos_comentarios':museos_comentarios})
+	return HttpResponse(template.render(c),content_type="text/rss+xml")

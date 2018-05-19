@@ -1,0 +1,30 @@
+ {
+	"MUSEOS SELECCIONADOS":{
+		"USER":"{{usuario}}",
+		"TITULO":"{{titulo_pagina}}",
+		{% for seleccionado in museos_seleccionados %}
+		"MUSEO":{
+			"ID-MUSEO":"{{seleccionado.museo.id_museo}}",
+			"NOMBRE":"{{seleccionado.museo.nombre}}",
+			"CONTENT-URL":"{{seleccionado.museo.content_url}}",
+			"DESCRIPCION":"{{seleccionado.museo.descripcion}}",
+			"EQUIPAMIENTO":"{{seleccionado.museo.equipamiento}}",
+			"ACCESIBILIDAD":"{{seleccionado.museo.accesibilidad}}"
+			"HORARIO":"{{seleccionado.museo.horario}}"
+			"DIRECCION":{
+				"NOMBRE_VIA":"{{seleccionado.museo.nombre_via}}",
+				"NUM":"{{seleccionado.museo.num}}",
+				"BARRIO":"{{seleccionado.museo.barrio}}"
+				"DISTRITO":"{{seleccionado.museo.distrito}}"
+				"CODIGO_POSTAL":"{{seleccionado.museo.codigo_postal}}"
+			},
+			"TRANSPORTE":"{{seleccionado.museo.transporte}}",
+			"DATOS-CONTACTO":{
+				"TELEFONO":"{{seleccionado.museo.transporte}}",
+				"EMAIL":"{{seleccionado.museo.email}}"
+			}
+
+		}
+{% endfor %}
+	}
+}

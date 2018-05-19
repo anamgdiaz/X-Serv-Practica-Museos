@@ -29,6 +29,9 @@ urlpatterns = [
     url(r'about$',views.about,name = "Información autoría de la práctica explicando el funcionamiento"),
     url(r'^cargar_datos$',views.cargar_datos, name = "Página donde se cargan los datos"),
     url(r'^xml$',views.pagina_principal_xml,name="Página Principal en XML"),
+    url(r'^json$',views.pagina_principal_json,name="Página Principal en JSON"),
+    url(r'^rss$',views.canal_rss,name="Canal de comentarios RSS"),
     url(r'(.*)/$',views.pagina_usuario,name = "Página personal del usuario"),
     url(r'^(.*)/xml$',views.pagina_xml,name = "Canal XML para los museos seleccionados por ese usuario"),
+    url(r'^(.*)/json$',views.pagina_json,name = "Canal JSON para los museos seleccionados por ese usuario"),
 ]
