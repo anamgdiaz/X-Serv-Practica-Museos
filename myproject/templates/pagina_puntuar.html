@@ -1,0 +1,27 @@
+{% extends "pagina_principal.html" %}
+<html>
+<body>
+	{% block login %}
+	<div class="right">
+		{{form_logueado|safe}}
+	</div>
+	{% endblock %}
+	{% block listas %}
+	<div class = "puntuar">
+		{{ranking|safe}}
+	</div>
+	<div class= "muestra_museos_punt">
+		{{lista_museos_punt|safe}}
+		{% if seleccion.has_previous %}
+		<a href="?page={{seleccion.previous_page_numbers}}"> Página Anterior</a>
+		{% endif %}
+
+	{{seleccion.number}} - {{seleccion.paginator.num_pages}}
+
+	{% if seleccion.has_next %}
+		<a href="?page={{seleccion.next_page_number}}"> Página Siguiente</a>
+	{% endif %}
+	</div>
+	{% endblock %}
+</body>
+</html>

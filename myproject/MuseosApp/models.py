@@ -27,6 +27,7 @@ class Museo(models.Model):
 	telefono = models.TextField(null = True)
 	email = models.CharField(max_length = 128,null = True)
 	num_comentario = models.IntegerField(default = 0)
+	puntuacion = models.IntegerField(default = 0)
 
 class Museo_CSV(models.Model):
 	id_museo = models.IntegerField()
@@ -51,7 +52,6 @@ class Comentarios(models.Model):
 	museo = models.ForeignKey(Museo)
 	txt = models.TextField()
 	usuario = models.CharField(max_length = 32)
-
 
 class Cambio_Estilo(models.Model):
 	usuario = models.ForeignKey(User)

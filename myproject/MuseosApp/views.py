@@ -263,6 +263,7 @@ def pagina_principal(request):
 @csrf_exempt		
 def pagina_museos(request):
 	template = get_template('pagina_museos.html')
+	seleccion = ''
 	if request.user.is_authenticated():
 		user = str(request.user)
 		form_logueado = 'Bienvenid@,' + user + '<br>'
@@ -291,7 +292,15 @@ def pagina_museos(request):
 		elif key == 'accesible' and valor == '0':
 			valor = 1
 			museos = Museo.objects.all()
-			for i in museos:
+			paginator = Paginator(museos,15)
+			page = request.GET.get('page')
+			try:
+	 			seleccion = paginator.page(page)
+			except PageNotAnInteger:
+				seleccion = paginator.page(1)
+			except EmptyPage:
+				seleccion = paginator.page(paginator.num_pages)
+			for i in seleccion:
 				lista_filtros += '<h3>'+i.nombre+'</h3>'
 				lista_filtros += 'Dirección:' + i.nombre_via + ',' + str(i.num) +'<br>'
 				lista_filtros +='<a href="' + i.content_url + '">' + i.content_url +'</a><br>'
@@ -318,14 +327,22 @@ def pagina_museos(request):
 
 	else:
 		museos_filtrados = Museo.objects.all()
-		for i in museos_filtrados:
+		paginator = Paginator(museos_filtrados,15)
+		page = request.GET.get('page')
+		try:
+	 		seleccion = paginator.page(page)
+		except PageNotAnInteger:
+			seleccion = paginator.page(1)
+		except EmptyPage:
+			seleccion = paginator.page(paginator.num_pages)
+		for i in seleccion:
 			lista_filtros += '<h3>'+i.nombre+'</h3>'
 			lista_filtros += 'Dirección:' + i.nombre_via + ',' + str(i.num) +'<br>'
 			lista_filtros +='<a href="' + i.content_url + '">' + i.content_url +'</a><br>'
 			lista_filtros+= '<a href=http://localhost:8000/museos/'+ str(i.id_museo)+ '>'+'Más Información</a><br>'
 	Boton = boton_accesible(valor)
 	pie_pagina = pagina_pie()
-	c = Context({'form_logueado': form_logueado,'lista_filtros':lista_filtros,'pie_pagina':pie_pagina,'Boton':Boton})
+	c = Context({'form_logueado': form_logueado,'lista_filtros':lista_filtros,'seleccion':seleccion,'pie_pagina':pie_pagina,'Boton':Boton})
 	
 	return HttpResponse(template.render(c))			
 
@@ -333,6 +350,7 @@ def pagina_museos(request):
 @csrf_exempt
 def pagina_museo(request,identidad):
 	template = get_template('pagina_museo.html')
+	puntuar = ''
 	if request.user.is_authenticated():
 		user = str(request.user)
 		form_logueado = 'Bienvenid@, ' + user + '<br>'
@@ -380,6 +398,8 @@ def pagina_museo(request,identidad):
 		muestra_museos += "<h3>Datos de Contacto: </h3>"+ '<br>'
 		muestra_museos += "<h4>      Telefono: </h4>" + telefono+ '<br>'
 		muestra_museos += "<h4>      Email: </h4>" + email+ '<br>'
+		puntuar += '<form action="" method ="POST">'
+		puntuar += '<button type="submit" name="Puntuar" value="'+nombre+'"><img src="/images/like.png"width="50"></button></form><br>'
 		form_comentario = ''
 		muestra_comentarios = ''
 		if request.user.is_authenticated():
@@ -420,6 +440,11 @@ def pagina_museo(request,identidad):
 						museo_sel.save()
 				except ObjectDoesNotExist:
 					return('')		
+			elif key == 'Puntuar':
+				nombre_mus = request.POST['Puntuar']
+				museo_punt = Museo.objects.get(nombre= nombre_mus)
+				museo_punt.puntuacion = museo_punt.puntuacion + 1 
+				museo_punt.save()
 		else:
 			lista_comentarios = Comentarios.objects.all()
 			muestra_comentarios = '<h4>Lista de Comentarios:</h4>'
@@ -428,7 +453,7 @@ def pagina_museo(request,identidad):
 					muestra_comentarios += comentario.txt
 					muestra_comentarios += '<br>'
 		pie_pagina = pagina_pie()
-		c = Context({'form_logueado':form_logueado,'muestra_museos':muestra_museos,'form_comentario':form_comentario,'muestra_comentarios':muestra_comentarios,'pie_pagina':pie_pagina})
+		c = Context({'form_logueado':form_logueado,'muestra_museos':muestra_museos,'form_comentario':form_comentario,'muestra_comentarios':muestra_comentarios,'puntuar':puntuar,'pie_pagina':pie_pagina})
 		return HttpResponse(template.render(c))		
 	except ObjectDoesNotExist:
 		return HttpResponse("No existe ningún museos para ese id")
@@ -497,7 +522,6 @@ def pagina_usuario(request,usuario):
 			usuario_camb.tamaño = request.POST['letra']
 			usuario_camb.color = request.POST['color']
 			usuario_camb.save()
-	
 	lista_museos_sel = ''
 	museos_seleccionados = Museo_Seleccionado.objects.filter(usuario = usuario_entra)
 	paginator = Paginator(museos_seleccionados,5)
@@ -588,3 +612,55 @@ def canal_rss(request):
 	museos_comentarios = Comentarios.objects.all()
 	c = RequestContext(request,{'museos_comentarios':museos_comentarios})
 	return HttpResponse(template.render(c),content_type="text/rss+xml")
+
+@csrf_exempt
+def puntuar(request):
+	template = get_template('pagina_puntuar.html')
+	ranking = ''
+	if request.user.is_authenticated():
+		user = str(request.user)
+		form_logueado = 'Bienvenid@,' + user +'<br>'
+		form_logueado += '<a href="http://localhost:8000/'+ user + '"> Mi página</a><br>'
+		form_logueado += '<a href="http://localhost:8000/'+ user + '/xml"> Mi página en XML</a><br>'
+		form_logueado += '<a href="http://localhost:8000/'+ user + '/json"> Mi página en JSON</a><br>'
+		form_logueado += '<a href="http://localhost:8000/logout">	Logout</a><br>'
+	else:
+		form_logueado = 'Para entrar al sitio vaya al '+'<a href="http://localhost:8000/">Inicio</a>'
+	museos = Museo.objects.all()
+	paginator = Paginator(museos,15)
+	page = request.GET.get('page')
+	try:
+	 	seleccion = paginator.page(page)
+	except PageNotAnInteger:
+		seleccion = paginator.page(1)
+	except EmptyPage:
+		seleccion = paginator.page(paginator.num_pages)
+	lista_museos_punt = "<h4>Museos de Madrid que puede seleccionar:</h4><br>"
+	for museo in seleccion:
+		nombre_museo = museo.nombre
+		lista_museos_punt += '<a href="http://localhost:8000/museos/'+ str(museo.id_museo)+'">'+ nombre_museo +'</a><br>'
+		lista_museos_punt +=	'<form action="" method ="POST">'
+		lista_museos_punt += '<button type="submit" name="Puntuar" value="'+nombre_museo+'"><img src="/images/like.png"width="10"></button></form><br>'
+	if request.method == 'POST':
+		key = request.body.decode("utf-8").split('=')[0]
+		if key == 'Puntuar':
+			nombre_mus = request.POST['Puntuar']
+			museo_punt = Museo.objects.get(nombre= nombre_mus)
+			museo_punt.puntuacion = museo_punt.puntuacion + 1 
+			museo_punt.save()
+		ranking = '<h3>TOP 5 Museos<h3>'
+		museo = Museo.objects.all()
+		lista_ranking = museos.order_by('-puntuacion')[:5]
+		for i in lista_ranking:
+			ranking += '<a href="http://localhost:8000/museos/'+ str(i.id_museo)+'">'+ str(i.nombre) +'</a><br>'
+			ranking += 'Puntuación: '+ str(i.puntuacion) +'<br>'
+	else:
+		ranking = '<h3>TOP 5 Museos<h3>'
+		museo = Museo.objects.all()
+		lista_ranking = museos.order_by('-puntuacion')[:5]
+		for i in lista_ranking:
+			ranking += '<a href="http://localhost:8000/museos/'+ str(i.id_museo)+'">'+ str(i.nombre) +'</a><br>'
+			ranking += 'Puntuación: '+ str(i.puntuacion) +'<br>'
+	pie_pagina = pagina_pie()
+	c = Context({'form_logueado':form_logueado,'lista_museos_punt':lista_museos_punt,'seleccion':seleccion,'ranking':ranking,'pie_pagina':pie_pagina})
+	return HttpResponse(template.render(c))

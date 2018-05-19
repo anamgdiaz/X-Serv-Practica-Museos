@@ -32,6 +32,7 @@ urlpatterns = [
     url(r'^xml$',views.pagina_principal_xml,name="Página Principal en XML"),
     url(r'^json$',views.pagina_principal_json,name="Página Principal en JSON"),
     url(r'^rss$',views.canal_rss,name="Canal de comentarios RSS"),
+    url(r'^puntuar$',views.puntuar,name="Página para puntuar los museos"),
     url(r'(.*)/$',views.pagina_usuario,name = "Página personal del usuario"),
     url(r'^(.*)/xml$',views.pagina_xml,name = "Canal XML para los museos seleccionados por ese usuario"),
     url(r'^(.*)/json$',views.pagina_json,name = "Canal JSON para los museos seleccionados por ese usuario"),

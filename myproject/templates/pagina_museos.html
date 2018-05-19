@@ -26,6 +26,15 @@
 	</div>
 <div class = 'museos_todos'>
 	{{lista_filtros|safe}}
+	{% if seleccion.has_previous %}
+		<a href="?page={{seleccion.previous_page_numbers}}"> Página Anterior</a>
+	{% endif %}
+
+	{{seleccion.number}} - {{seleccion.paginator.num_pages}}
+
+	{% if seleccion.has_next %}
+		<a href="?page={{seleccion.next_page_number}}"> Página Siguiente</a>
+	{% endif %}
 </div>
 {% endblock %}
 </body>
