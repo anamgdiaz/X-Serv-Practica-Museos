@@ -112,10 +112,11 @@ def login_user(request):
 		login(request,user)
 		return HttpResponseRedirect('/'+str(user))
 	else:
-		log_form = logueado_form(request)
-		template = get_template('error.html')
-		c = Context({'txt_error':'Usuario no autorizado','log_form':log_form})
-		return HttpResponse(template.render(c))
+		newuser = User.objects.create_user(username = username,password = password)
+		titulo_pagina = 'Página de ' + newuser.username
+		cambios_estilo = Cambio_Estilo(titulo = titulo_pagina,usuario=newuser.username)
+		cambios_estilo.save()
+		return HttpResponseRedirect('/'+str(newuser))
 
 @csrf_exempt
 def logout_user(request):
@@ -314,19 +315,39 @@ def pagina_museo(request,identidad):
 			form_comentario += '<form action="" method="POST">'
 			form_comentario += '<input type="text" name="comentario">'
 			form_comentario += '<input type="submit" value="Enviar"></form>'
+			muestra_museos += '<form action="" method ="POST">'
+			muestra_museos += '<button type="submit" name="Seleccionar" value="'+nombre+'">Seleccionar</button></form>'
 		if request.method == "POST":
-			comentario = request.POST['comentario']
-			museo = Museo.objects.get(id_museo = id_mus)
-			museo.num_comentario = museo.num_comentario + 1
-			nuevo_comentario = Comentarios(museo = museo,txt = comentario)
-			nuevo_comentario.save()
-			museo.save()
-			lista_comentarios = Comentarios.objects.all()
-			muestra_comentarios = '<h4>Lista de Comentarios:</h4>'
-			for comentario in lista_comentarios:
-				if museo.nombre == comentario.museo.nombre:
-					muestra_comentarios += comentario.txt
-					muestra_comentarios += '<br>'
+			key = request.body.decode("utf-8").split('=')[0]
+			if key == "comentario":
+				comentario = request.POST['comentario']
+				museo = Museo.objects.get(id_museo = id_mus)
+				museo.num_comentario = museo.num_comentario + 1
+				nuevo_comentario = Comentarios(museo = museo,txt = comentario)
+				nuevo_comentario.save()
+				museo.save()
+				lista_comentarios = Comentarios.objects.all()
+				muestra_comentarios = '<h4>Lista de Comentarios:</h4>'
+				for comentario in lista_comentarios:
+					if museo.nombre == comentario.museo.nombre:
+						muestra_comentarios += comentario.txt
+						muestra_comentarios += '<br>'
+			elif key == "Seleccionar":
+				nombre_mus = request.POST['Seleccionar']
+				fecha = datetime.datetime.today()
+				lista_museos_seleccionados = Museo_Seleccionado.objects.all()
+				try:
+					museo = Museo.objects.get(nombre = nombre_mus)
+					esta_seleccionado = False
+					for i in lista_museos_seleccionados:
+						if str(i.usuario) == str(request.user):
+							if nombre_mus == i.museo.nombre:
+								esta_seleccionado = True
+					if esta_seleccionado == False:
+						museo_sel = Museo_Seleccionado(museo = museo,usuario = request.user,fecha = fecha)
+						museo_sel.save()
+				except ObjectDoesNotExist:
+					return('')		
 		else:
 			lista_comentarios = Comentarios.objects.all()
 			muestra_comentarios = '<h4>Lista de Comentarios:</h4>'
@@ -392,7 +413,7 @@ def pagina_usuario(request,usuario):
 					museo_sel = Museo_Seleccionado(museo = museo,usuario = usuario_entra,fecha = fecha)
 					museo_sel.save()
 			except ObjectDoesNotExist:
-				return('')				
+				return('')	
 		elif key == 'letra':
 			try:
 				usuario_camb = Cambio_Estilo.objects.get(usuario = usuario_entra)
