@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+
 # Create your models here.
 
 class Museo(models.Model): 
@@ -26,7 +27,26 @@ class Museo(models.Model):
 	telefono = models.TextField(null = True)
 	email = models.CharField(max_length = 128,null = True)
 	num_comentario = models.IntegerField(default = 0)
-	
+
+class Museo_CSV(models.Model):
+	id_museo = models.IntegerField()
+	nombre = models.CharField(max_length = 128)
+	descripcion = models.TextField(null = True)
+	horario =  models.TextField(null = True)
+	equipamiento = models.TextField(null = True)
+	transporte = models.TextField(null = True)
+	accesibilidad = models.CharField(max_length= 8)
+	content_url = models.URLField()
+	nombre_via = models.CharField(max_length = 128)
+	num = models.FloatField()
+	localidad = models.CharField(max_length = 64)
+	provincia = models.CharField(max_length = 64)
+	codigo_postal = models.IntegerField(null = True)
+	barrio =models.CharField(max_length = 64)
+	distrito = models.CharField(max_length = 64)
+	telefono = models.TextField(null = True)
+	email = models.CharField(max_length = 128,null = True)
+
 class Comentarios(models.Model):
 	museo = models.ForeignKey(Museo)
 	txt = models.TextField()

@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from .models import Museo,Comentarios,Cambio_Estilo, Museo_Seleccionado
+from .models import Museo,Comentarios,Cambio_Estilo, Museo_Seleccionado,Museo_CSV
 from django.http import HttpResponse,HttpResponseRedirect
 from django.contrib.auth.models import User
 from django.contrib.auth import login,logout,authenticate
@@ -10,6 +10,7 @@ import xml.etree.ElementTree as ET
 import datetime
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.core.exceptions import ObjectDoesNotExist
+import csv
 # Create your views here.
 
 def pagina_pie():
@@ -19,6 +20,41 @@ def pagina_pie():
 	respuesta += '<p><a href="' + url_xml + '">Enlace al fichero XML </a></p>'
 	respuesta += '<p><a href="' + url_descr + '">Enlace a la descripción </a></p>'
 	return respuesta
+
+@csrf_exempt
+def cargar_datos_csv(request):	
+	with open('MuseosApp/201132-0-museos.csv',encoding='ISO-8859-1') as csvfile:
+		reader = csv.reader(csvfile, delimiter=';')
+		i = 0
+		for row in reader:
+			try:
+				id_museo = row[0]
+				nombre = row[1]
+				descripcion = row[2]
+				horario =  row[3]
+				equipamiento = row[4]
+				transporte = row[5]
+				accesibilidad = row[7]
+				content_url = row[8]
+				nombre_via = row[9]
+				num = row[12]
+				localidad = row[17]
+				provincia = row[18]
+				codigo_postal = row[19]
+				barrio = row[20]
+				distrito = row[21]
+				telefono = row[26]
+				email = row[28]
+				if i != 0:
+					museo_csv = Museo_CSV(id_museo=id_museo,nombre = nombre,descripcion = descripcion,horario = horario,transporte=transporte,accesibilidad = accesibilidad,nombre_via = nombre_via,num = num,
+					 localidad = localidad,provincia = provincia,codigo_postal = codigo_postal,barrio = barrio,distrito= distrito,telefono =telefono,email= email)
+					museo_csv.save()
+				i = i + 1
+			except IndexError:
+				pass
+
+	return HttpResponseRedirect('/')
+
 @csrf_exempt
 def cargar_datos(request):
 	tree = ET.parse('MuseosApp/201132-0-museos.xml')
@@ -146,6 +182,7 @@ def pagina_principal(request):
 	valor = 1
 	titulo_pagina = ''
 	cargar = ''
+	cargar_csv = ''
 	if request.user.is_authenticated():
 		usuario = str(request.user)
 		form_logueado = 'Bienvenid@,' + usuario + '<br>'
@@ -196,7 +233,11 @@ def pagina_principal(request):
 	museos = Museo.objects.all()
 	if len(museos) == 0:
 		cargar = '<form method="post" action="/cargar_datos">'
-		cargar += '<input type="submit" value="Cargar_museos" name="cargar"></form>'
+		cargar += '<input type="submit" value="Cargar_museos" name="Cargar"></form>'
+	museos_csv = Museo_CSV.objects.all()
+	if len(museos_csv) == 0:
+		cargar_csv = '<form method="post" action="/cargar_datos_csv">'
+		cargar_csv += '<input type="submit" value="Cargar_museos_csv" name="Cargar CSV"></form>'
 	pie_pagina = pagina_pie()
 	Boton = boton_accesible(valor)
 	usuario_entra = User.objects.all()
@@ -216,7 +257,7 @@ def pagina_principal(request):
 		except ObjectDoesNotExist:
 			lista_usuarios += "Pagina personal de " + str(usuario.username)	
 
-	c = Context({'Boton':Boton,'pie_pagina':pie_pagina,'form_logueado':form_logueado,'lista':lista,'lista_usuarios':lista_usuarios,'cargar':cargar})	
+	c = Context({'Boton':Boton,'pie_pagina':pie_pagina,'form_logueado':form_logueado,'lista':lista,'lista_usuarios':lista_usuarios,'cargar':cargar,'cargar_csv':cargar_csv})	
 	return HttpResponse(template.render(c))		
 
 @csrf_exempt		

@@ -28,6 +28,7 @@ urlpatterns = [
     url(r'^logout',views.logout_user),
     url(r'about$',views.about,name = "Información autoría de la práctica explicando el funcionamiento"),
     url(r'^cargar_datos$',views.cargar_datos, name = "Página donde se cargan los datos"),
+    url(r'^cargar_datos_csv$',views.cargar_datos_csv, name = "Página donde se cargan los datos desde un CSV"),
     url(r'^xml$',views.pagina_principal_xml,name="Página Principal en XML"),
     url(r'^json$',views.pagina_principal_json,name="Página Principal en JSON"),
     url(r'^rss$',views.canal_rss,name="Canal de comentarios RSS"),
