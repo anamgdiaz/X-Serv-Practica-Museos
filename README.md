@@ -12,7 +12,7 @@
 	* Inclusión de favicon<br />
 	* Canal XML para la página principal<br />
 	* Canal JSON para la página principal y para la de usuario.<br />
-	* Canal RSS para los<br />
+	* Canal RSS para los comentarios<br />
 	* Leer los datos del Ayuntamiento desde CSV<br />
 	* Regisitro de usuarios<br />
 	* Puntuación de museos<br />
