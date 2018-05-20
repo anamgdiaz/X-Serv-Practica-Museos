@@ -149,10 +149,11 @@ def login_user(request):
 		return HttpResponseRedirect('/'+str(user))
 	else:
 		newuser = User.objects.create_user(username = username,password = password)
+		users = User.objects.get(username = username)
 		titulo_pagina = 'Página de ' + newuser.username
-		cambios_estilo = Cambio_Estilo(titulo = titulo_pagina,usuario=newuser.username)
+		cambios_estilo = Cambio_Estilo(titulo = titulo_pagina,usuario =users)
 		cambios_estilo.save()
-		return HttpResponseRedirect('/'+str(newuser))
+		return HttpResponseRedirect('/')
 
 @csrf_exempt
 def logout_user(request):
@@ -384,6 +385,7 @@ def pagina_museo(request,identidad):
 		content_url = museo.content_url
 		accesibilidad = museo.accesibilidad
 		equipamiento = museo.equipamiento
+		puntuacion = museo.puntuacion
 		muestra_museos = '<h2>' + '<a href="' + content_url + '">' + nombre +'</a></h2>'
 		muestra_museos += "<h4>Descripcion: </h4>" + descripcion + '<br>'
 		muestra_museos += "<h4>Equipamiento: </h4>" + equipamiento + '<br>'
@@ -398,7 +400,8 @@ def pagina_museo(request,identidad):
 		muestra_museos += "<h3>Datos de Contacto: </h3>"+ '<br>'
 		muestra_museos += "<h4>      Telefono: </h4>" + telefono+ '<br>'
 		muestra_museos += "<h4>      Email: </h4>" + email+ '<br>'
-		puntuar += '<form action="" method ="POST">'
+		muestra_museos += "<h4>		 Puntuación: </h4>"+str(puntuacion)+'<br>'
+		puntuar += '<br><br><form action="" method ="POST">'
 		puntuar += '<button type="submit" name="Puntuar" value="'+nombre+'"><img src="/images/like.png"width="50"></button></form><br>'
 		form_comentario = ''
 		muestra_comentarios = ''

@@ -129,7 +129,7 @@ li a:hover:not(.active) {
     opacity:0.9;
 }
 .muestra_museos{
-	margin-top:-100px;
+	margin-top:-150px;
     width:700px;
     border:1px solid #D35400;
     margin-left: 150px;
@@ -151,7 +151,7 @@ li a:hover:not(.active) {
 
 }
 .lista_museos{
-	margin-top:50px;
+	margin-top:0px;
     width:500px;
     border:1px solid #D35400;
     height:auto;
@@ -230,7 +230,7 @@ li a:hover:not(.active) {
 #pie_pagina{
 	background-color: #F5B7B1;
 	text-align: center;
-	margin-top:200px;
+	margin-top:400px;
 	margin-left: -100px;
 	width: 1500px;
 	font-size:10px;
